@@ -1,0 +1,14 @@
+sundial zmap module changelog
+
+Version 0.1
+Initial version
+
+Version 0.1b 
+Bugfix: Fixed issue with tamper-detection hash for BAD_CLOCK timestamp request 
+
+Version 0.2
+Updated to work with zmap commit 6e79f3b, which added support for custom TTL
+value for probe packets. Breaks compatibility with previous zmap versions. 
+
+Version 0.2b
+Updated to work with latest zmap (Aug 4, 2019)
