@@ -11,7 +11,7 @@
 1. **Dependencies**:  Zmap itself requires several dependencies; a handy list
    of debian packages that are pre-requisites include:
 
-     `$ sudo apt-get install build-essential cmake libgmp3-dev gengetopt libpcap-dev flex byacc`
+     `$ sudo apt-get install build-essential cmake libgmp3-dev gengetopt libpcap-dev flex byacc libjson-c-dev pkg-config libunistring-dev`
 
 2. **Building**:  Follow these steps to build Zmap with Sundial support:
     - Clone Zmap (https://github.com/zmap/zmap)
