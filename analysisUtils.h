@@ -32,10 +32,10 @@ options opt = {0};
 #define MSB 2147483648
 
 /* @brief Probe request types */
-#define REQ_STANDARD 1
-#define REQ_BADCLOCK 2
-#define REQ_BADCHECKSUM 3
-#define REQ_DUPLICATETS 4
+#define REQ_STANDARD 0
+#define REQ_BADCLOCK 1
+#define REQ_BADCHECKSUM 2
+#define REQ_DUPLICATETS 3
 
 /* @brief Response types */
 #define VALID_REPLY 0
