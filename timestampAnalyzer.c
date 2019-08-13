@@ -44,11 +44,10 @@
 #include "analysisUtils.h"
 #include <ctype.h>
 #include <unistd.h>
-#include "md5.h" /* Alternatively, <openssl/md6.h> */
+#include "md5.h" /* Alternatively, <openssl/md5.h> */
 
 int pktcnt = 0;
 char result_path[256] = {0};
-struct stats total = {0};
 FILE * res;
 
 /* @brief unused */
@@ -165,7 +164,8 @@ void write_reply(const struct pcap_pkthdr * header,
  * Origin timestamp,
  * Receive timestamp,
  * Transmit timestamp,
- * Request type -- one of NORMAL, BAD_CLOCK, BAD_CHECKSUM, DUPLICATE_TS
+ * Request type -- one of REQ_STANDARD, REQ_BADCLOCK, REQ_BADCHECKSUM,
+ * REQ_DUPLICATETS
  */
 void write_req(const struct pcap_pkthdr * header,
     struct in_addr * dst_addr, struct ts_header * ts_hdr) {
@@ -189,10 +189,10 @@ void write_req(const struct pcap_pkthdr * header,
 int getReqType(struct in_addr * dst_addr, struct ts_header * ts) {
   /* This method determines which type of probe a request was in order to be
    * able to correctly categorize replies. The categories are:
-   * NORMAL -- normal probe
-   * BAD_CLOCK -- bad clock probe
-   * BAD_CHECKSUM -- incorrect checksum
-   * DUPLICATE_TS -- all three ts same
+   * REQ_STANDARD -- standard probe
+   * REQ_BADCLOCK -- bad clock probe
+   * REQ_BADCHECKSUM -- incorrect checksum
+   * REQ_DUPLICATETS -- all three ts same
    * Returns macro for the request type.
    * */
 
@@ -200,24 +200,24 @@ int getReqType(struct in_addr * dst_addr, struct ts_header * ts) {
 
   _DEBUG("%s%s\n", "Destination IP address: ",inet_ntoa(*dst_addr));
    
-  /*  DUPLICATE_TS -- Are all timestamps the same? */
+  /*  REQ_DUPLICATETS -- Are all timestamps the same? */
   if ( (ts->originate_ts == ts->receive_ts) && (ts->originate_ts == ts->transmit_ts))
-    return DUPLICATE_TS;
+    return REQ_DUPLICATETS;
 
-  /* BAD_CHECKSUM -- Calc correct checksum, compare to packet */
+  /* REQ_BADCHECKSUM -- Calc correct checksum, compare to packet */
   else if (ts->checksum != calcChecksum(ts))
-    return BAD_CHECKSUM;
+    return REQ_BADCHECKSUM;
 
-  /* BAD_CLOCK -- check if originate ts is a hash of the id/seq */
+  /* REQ_BADCLOCK -- check if originate ts is a hash of the id/seq */
   else if (validateTimestamp(inet_ntoa(*dst_addr), ts->originate_ts,
         ts->id, ts->seq) > 0 )
 
-    return BAD_CLOCK;
+    return REQ_BADCLOCK;
 
-  /* NORMAL -- check if the id/seq are a hash of the originate timestamp */
+  /* REQ_STANDARD -- check if the id/seq are a hash of the originate timestamp */
   else if (validateIdSeq(inet_ntoa(*dst_addr), ts->originate_ts, ntohs(ts->id),
         ntohs(ts->seq)) > 0 )
-    return NORMAL;
+    return REQ_STANDARD;
 
   /* Shouldn't reach this */
   else{
@@ -402,7 +402,7 @@ int validateReply(struct in_addr * src_ip, struct ts_header * reply){
    * */
   else if (validateTimestamp(inet_ntoa(*src_ip), reply->originate_ts,
                     reply->id, reply->seq) > 0)
-    return BAD_CLOCK;
+    return VALID_REPLY;
 
   /* Some field has been messed with. Can't trust */
   else
@@ -495,22 +495,25 @@ int main (int argc, char * argv[]){
   char * filename = NULL;
   int c;
   int index;
-  opterr = 0;
+  opterr = opt.bork = 0;
+  opt.replies = opt.requests = 1;
 
   while ((c = getopt (argc, argv, "qrb")) != -1)
-  switch (c)
   {
-    case 'q':
-      opt.requests = 0;
-      break;
-    case 'r':
-      opt.replies = 0;
-      break;
-    case 'b':
-      opt.bork = 1;
-      break;
-    default:
-      usage(argv[0]);
+    switch (c)
+    {
+      case 'q':
+        opt.requests = 0;
+        break;
+      case 'r':
+        opt.replies = 0;
+        break;
+      case 'b':
+        opt.bork = 1;
+        break;
+      default:
+        usage(argv[0]);
+    } 
   }
 
   if (!opt.requests && !opt.replies) 
