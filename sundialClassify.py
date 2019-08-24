@@ -98,7 +98,7 @@ def writeStats(results, name):
 
 def writeFingerprints(fingerprints, name):
     '''
-    printFingerprints
+    writeFingerprints
     @params: 
     results, a dict of fingerprints -> counts
     '''
@@ -1506,7 +1506,7 @@ if __name__ == "__main__":
 
     if args.writestats:
         logging.info("\n[+] Fingerprints:")
-        printFingerprints(fingerprints,'fingerprints.stats')
+        writeFingerprints(fingerprints,'fingerprints.stats')
 
     if args.output:
         logging.info("\n[+] Wrote per-IP classification:", args.output)
