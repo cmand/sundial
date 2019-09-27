@@ -890,6 +890,7 @@ def allRequests(reqs):
     logging.debug("[+] %s", types)
     if sorted(types) == range(4):
         return True
+    logging.warn("Skipping target, expected 4 response types, got %s" % str(sorted(types)))
     return False
 
 def isNormalReply(reply):
