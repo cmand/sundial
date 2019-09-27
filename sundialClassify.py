@@ -248,7 +248,7 @@ def classify(reqs, reps):
             results['stuckLE1Rx'] += 1
             fprint[STUCKLE1RX] = 1
         elif const == TX_ONLY:
-            results['stuck1Tx'] += 1
+            results['stuckLE1Tx'] += 1
             fprint[STUCKLE1TX] = 1
         else:
             logging.warn("Error! Shouldn't get here.")
@@ -1509,5 +1509,5 @@ if __name__ == "__main__":
         writeFingerprints(fingerprints,'fingerprints.stats')
 
     if args.output:
-        logging.info("\n[+] Wrote per-IP classification:", args.output)
+        logging.info("\n[+] Wrote per-IP classification: %s", args.output)
         writeClassifications(fingerprints, args.output)
